@@ -40,7 +40,7 @@ global.rdf = (->
 	class rdf.BlankNode 
 		constructor: ->
 			@nominalValue = 'b'.concat(++rdf.BlankNode.NEXTID)
-		interfaceName:	'BlankNode'
+			@interfaceName = 'BlankNode'
 		valueOf: ->
 			@nominalValue
 		equals: (o) ->
@@ -59,11 +59,12 @@ global.rdf = (->
 	class rdf.NamedNode 
 		constructor: (iri) ->
 			@nominalValue = iri
-		interfaceName:	'NamedNode'
+			@interfaceName = 'NamedNode'
 		valueOf: ->
 			@nominalValue
 		equals: (o) ->
-			if not o.hasOwnProperty('interfaceName') then return @nominalValue is o
+			#if not o.hasOwnProperty('interfaceName') then 
+			return @nominalValue is o
 			if o.interfaceName is @interfaceName then return @nominalValue is o.nominalValue
 			else return false
 		toString: ->
@@ -80,14 +81,15 @@ global.rdf = (->
 			@nominalValue = value
 			@language = language
 			@datatype = datatype
-			@h = language + '|' + (if datatype then datatype.toString() else '') + '|' + value.toString()
+			@h = ->
+				language + '|' + (if datatype then datatype.toString() else '') + '|' + value.toString()
 			@valueOf = -> 
 				if nativ is null then @nominalValue else nativ
-		interfaceName:	'Literal'
+			@interfaceName = 'Literal'
 		equals: (o) ->
 			if not o.hasOwnProperty('interfaceName') then return @valueOf() is o
 			if o.interfaceName isnt @interfaceName then return false
-			@h is o.h
+			@h is o.h()
 		toString: ->
 			@nominalValue.toString()
 		toNT: ->
@@ -117,17 +119,17 @@ global.rdf = (->
 	
 	class rdf.Graph
 		constructor: (a) ->
+			@_graph	= []
+			@_spo	= {}
 			if a? then @addArray a
-		_graph: []
-		_spo: {}
 		length: ->
 			@_graph.length
 		add: (t) ->
 			# console.log t.s
-			@_spo[t.s.h] or (@_spo[t.s.h] = {})
-			@_spo[t.s.h][t.p.h] or (@_spo[t.s.h][t.p.h] = {})
-			if not @_spo[t.s.h][t.p.h][t.o.h]
-				@_spo[t.s.h][t.p.h][t.o.h] = t
+			@_spo[t.s.h()] or (@_spo[t.s.h()] = {})
+			@_spo[t.s.h()][t.p.h()] or (@_spo[t.s.h()][t.p.h()] = {})
+			if not @_spo[t.s.h()][t.p.h()][t.o.h()]
+				@_spo[t.s.h()][t.p.h()][t.o.h()] = t
 				@_graph.push(t)
 				_.forEach(@actions, (a)->
 					a.run(t)
@@ -141,8 +143,8 @@ global.rdf = (->
 				)
 			return this
 		remove: (t) ->
-			@_spo[t.s.h] and @_spo[t.s.h][t.p.h] and @_spo[t.s.h][t.p.h][t.o.h] and (
-				delete @_spo[t.s.h][t.p.h][t.o.h] and
+			@_spo[t.s.h()] and @_spo[t.s.h()][t.p.h()] and @_spo[t.s.h()][t.p.h()][t.o.h()] and (
+				delete @_spo[t.s.h()][t.p.h()][t.o.h()] and
 				@_graph.splice(_.indexOf(@_graph, t), 1)
 			)
 			return this
@@ -346,7 +348,7 @@ global.rdf = (->
 			return r
 		toArray: ->
 			a = new Array
-			_.forEach(@keys, (k) ->
+			_.forEach(@keys(), (k) ->
 				a.push @get k
 			, this)
 			return a
@@ -1151,8 +1153,9 @@ global.rdf = (->
 		_distinct: (a) ->
 			o = new api.Hash
 			for i in @_graph
-				if not o.exists i[a].h
-					o.set i[a].h, i[a]
+				if not o.exists i[a].h()
+					o.set i[a].h(), i[a]
+			console.log o
 			return o.toArray()
 		subjects: 	-> return @_distinct 's'
 		predicates:	-> return @_distinct 'p'

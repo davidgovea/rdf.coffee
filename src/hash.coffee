@@ -22,7 +22,7 @@
 			return r
 		toArray: ->
 			a = new Array
-			_.forEach(@keys, (k) ->
+			_.forEach(@keys(), (k) ->
 				a.push @get k
 			, this)
 			return a
