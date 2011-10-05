@@ -10,7 +10,6 @@
 			for i in @_graph
 				if not o.exists i[a].h()
 					o.set i[a].h(), i[a]
-			console.log o
 			return o.toArray()
 		subjects: 	-> return @_distinct 's'
 		predicates:	-> return @_distinct 'p'
