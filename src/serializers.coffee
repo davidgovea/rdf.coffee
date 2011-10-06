@@ -21,8 +21,8 @@
 		serialize: (graph) ->
 			@initiate()
 			graph = @suckLists graph
-			_.forEach(graph, (t, i, s)->
-				this.addTripleToIndex t, i, s
+			graph.forEach((t, i, s) =>
+				@.addTripleToIndex t, i, s
 			, this)
 			return @render()
 		startsWith: (o, s, i) ->
@@ -54,7 +54,7 @@
 			@usedPrefixes	= new Array
 			@nonAnonBNodes	= new api.Hash
 			@skipSubjects	= new Array
-			@suckLists		= new api.Hash
+			@lists			= new api.Hash
 		output: (o) ->
 			if o.interfaceName is "NamedNode" then return @shrink o
 			if o.interfaceName is "Literal" and o.datatype
@@ -164,11 +164,11 @@
 			members = graph.filter((t, i, s) ->
 				return t.property.equals(api.serializers.Turtle.RDF_FIRST) or t.property.equals(api.serializers.Turtle.RDF_REST)
 			)
-			_.forEach(members, (t, i, s) ->
+			members.forEach((t, i, s) ->
 				graph = graph.filter tFilter t
 			)
 			ends = members.filter((t, i, s) -> return t.object.equals api.serializers.Turtle.RDF_NIL)
-			_.forEach(ends, (n, i, s) ->
+			ends.forEach((n, i, s) ->
 				tmplist = new Array
 				q = n
 				start = null

@@ -44,8 +44,9 @@ global.rdf = (->
 		valueOf: ->
 			@nominalValue
 		equals: (o) ->
-			if not o.hasOwnProperty('interfaceName') then return @nominalValue is o
-			if o.interfaceName is @interfaceName then return @nominalValue is o.nominalValue
+			if o?
+				if not o.hasOwnProperty('interfaceName') then return @nominalValue is o
+				if o.interfaceName is @interfaceName then return @nominalValue is o.nominalValue
 			else return false
 		toString: ->
 			'_:'.concat(@nominalValue)
@@ -63,9 +64,9 @@ global.rdf = (->
 		valueOf: ->
 			@nominalValue
 		equals: (o) ->
-			#if not o.hasOwnProperty('interfaceName') then 
-			return @nominalValue is o
-			if o.interfaceName is @interfaceName then return @nominalValue is o.nominalValue
+			if o?
+				if not o.hasOwnProperty('interfaceName') then return @nominalValue is o
+				if o.interfaceName is @interfaceName then return @nominalValue is o.nominalValue
 			else return false
 		toString: ->
 			@nominalValue.toString()
@@ -87,9 +88,10 @@ global.rdf = (->
 				if nativ is null then @nominalValue else nativ
 			@interfaceName = 'Literal'
 		equals: (o) ->
-			if not o.hasOwnProperty('interfaceName') then return @valueOf() is o
-			if o.interfaceName isnt @interfaceName then return false
-			@h is o.h()
+			if o?
+				if not o.hasOwnProperty('interfaceName') then return @valueOf() is o
+				if o.interfaceName isnt @interfaceName then return false
+			@h() is o.h()
 		toString: ->
 			@nominalValue.toString()
 		toNT: ->
